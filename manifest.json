@@ -1,0 +1,20 @@
+{
+    "name": "Internal Redirector",
+    "version": "0.1",
+    "background": {
+        "page": "background.html"
+    },
+    "permissions": ["webRequest",
+                    "webRequestBlocking",
+                    "https://*/*",
+                    "http://fonts.googleapis.com/*"],
+    "manifest_version": 2,
+    "browser_action": {
+        "default_icon": {
+            "19": "images/19-disabled.png",
+            "38": "images/38.png"
+        }
+    },
+    "options_page": "options.html",
+    "content_security_policy": "script-src 'self'  'unsafe-eval'; object-src 'self'"
+}

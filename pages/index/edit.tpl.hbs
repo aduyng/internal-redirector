@@ -1,0 +1,35 @@
+<div class="page-header">
+    <div class="pull-right">
+        <button type="button" id="{{id}}-back" class="btn btn-default"><i class="icon-arrow-left"></i> Back</button>
+    </div>
+    <h3>{{#if data.id}}Edit Profile: {{data.name}}{{else}}New Profile{{/if}}</h3>
+</div>
+
+<form
+        id="{{id}}-form"
+        role="form"
+        data-bv-message="This value is not valid"
+        data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+        data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+        data-bv-feedbackicons-validating="glyphicon glyphicon-refresh"
+        data-bv-submitbuttons="#{{id}}-save"
+        data-bv-live="enabled">
+
+    <div class="form-group">
+        <label for="{{id}}-name">Name</label>
+        <input type="text" class="form-control {{id}}-field" id="{{id}}-name" name="name" value="{{data.name}}"/>
+        <span class="help-block" id="{{id}}-name-message"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="{{id}}-rules">Rules</label>
+
+        <div id="{{id}}-rules">
+        </div>
+    </div>
+    <div class="pull-right">
+        <button type="button" id="{{id}}-delete" class="btn btn-danger {{#if data.isInUse}}hidden{{/if}}"><i
+                class="icon-trash"></i> Delete
+        </button>
+    </div>
+</form>

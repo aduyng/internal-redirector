@@ -1,0 +1,33 @@
+
+<table class="table table-bordered table-condensed table-striped">
+    <thead>
+    <tr>
+        <th>Pattern</th>
+        <th>Replace With</th>
+        <th>
+            <button type="button" class="btn btn-sm btn-success" id="{{id}}-new" title="Add new"><i class="icon icon-plus-circle"></i>
+                New
+            </button>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each data}}
+        <tr class="{{../id}}-rule" data-id="{{this.id}}">
+            <td><input class="form-control input-sm {{../id}}-pattern" data-id="{{this.id}}" type="text" value="{{this.pattern}}" id="{{../id}}-pattern-{{this.id}}"
+                       placeholder="Enter search pattern"/></td>
+            <td><input class="form-control input-sm {{../id}}-replacement" data-id="{{this.id}}" type="text" value="{{this.replacement}}" id="{{../id}}-replacement-{{this.id}}"
+                       placeholder="Enter replacement"/></td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger {{../id}}-remove" data-id="{{this.id}}" title="Remove"><i class="icon icon-trash"></i>
+                </button>
+            </td>
+        </tr>
+    {{else}}
+        <tr class="warning">
+            <td colspan="3">The list is empty</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+
