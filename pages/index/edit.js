@@ -1,4 +1,3 @@
-/*global _, _s*/
 define(function (require) {
     'use strict';
     var Super = require('views/page'),
@@ -6,7 +5,7 @@ define(function (require) {
         Dialog = require('views/controls/dialog'),
         RulesView = require('./edit/rules'),
         Rules = require('collections/rules'),
-        NProgress = require('nprogress'),
+        BootstapValidator = require('bootstrapValidator'),
         Template = require('hbs!./edit.tpl');
 
     var Page = Super.extend({});
@@ -41,6 +40,9 @@ define(function (require) {
                 });
 
                 that.rulesView.render();
+
+                //enable validator
+                that.controls.form.bootstrapValidator();
 
                 var events = {};
 

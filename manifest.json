@@ -4,17 +4,26 @@
     "background": {
         "page": "background.html"
     },
-    "permissions": ["webRequest",
-                    "webRequestBlocking",
-                    "https://*/*",
-                    "http://fonts.googleapis.com/*"],
+    "permissions": [
+        "tabs",
+        "webRequest",
+        "webRequestBlocking",
+        "https://*/*",
+        "http://fonts.googleapis.com/*"],
+    "icons": {
+        "16": "images/16.png",
+        "48": "images/32.png",
+        "128": "images/128.png"
+    },
     "manifest_version": 2,
+
     "browser_action": {
         "default_icon": {
-            "19": "images/19-disabled.png",
-            "38": "images/38.png"
+            "19": "images/19-enabled.png",
+            "38": "images/38-enabled.png"
         }
     },
+
     "options_page": "options.html",
-    "content_security_policy": "script-src 'self'  'unsafe-eval'; object-src 'self'"
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

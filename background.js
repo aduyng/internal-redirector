@@ -1,40 +1,3 @@
-//
-////region the following options will be moved to chrome local profiles
-//var options = {
-//    redirectTypes: ["stylesheet",
-//                    "script",
-//                    "image",
-//                    "xmlhttprequest"],
-//    matchingUrls: ["https://*.sabresonicweb.com/*.tpl",
-//                   "https://*.sabresonicweb.com/*.js"],
-//    developmentMode: false
-//};
-////endregion
-//
-//
-//function getRedirectUrl(url) {
-//    'use strict';
-//
-//    var redirectUrl = url.replace(/^.+\/responsive\//i, chrome.extension.getURL('resources/responsive/'));
-//    if (!options.developmentMode) {
-//        redirectUrl = redirectUrl.replace('/build/', '/');
-//    }
-//    return redirectUrl;
-//}
-//
-//chrome.webRequest.onBeforeRequest.addListener(
-//    function (info) {
-//        var redirectUrl = getRedirectUrl(info.url);
-//        return {redirectUrl: redirectUrl};
-//    },
-//    // filters
-//    {
-//        urls: options.matchingUrls,
-//        types: options.redirectTypes
-//    },
-//    // extraInfoSpec
-//    ["blocking"]);
-
 define(function (require) {
     'use strict';
 
@@ -42,7 +5,7 @@ define(function (require) {
         Super = Backbone.Model,
         Profiles = require('collections/profiles'),
         Rules = require('collections/rules'),
-        Collection = require('collections/base'),
+        EnabledTabs = require('collections/enabled-tabs'),
         App = Backbone.Model.extend({
 
         });
@@ -50,36 +13,13 @@ define(function (require) {
     App.prototype.initialize = function (options) {
         Super.prototype.initialize.call(this, options);
 
-        this.resourceTypes = new Collection();
-        this.resourceTypes.add({
-            id: 'stylesheet',
-            name: 'Stylesheet'
-        });
-        this.resourceTypes.add({
-            id: 'script',
-            name: 'Script'
-        });
-
-        this.resourceTypes.add({
-            id: 'image',
-            name: 'Image'
-        });
-
-        this.resourceTypes.add({
-            id: 'xmlhttprequest',
-            name: 'XMLHttpRequest'
-        });
-
-        this.resourceTypes.add({
-            id: 'object',
-            name: 'Object'
-        });
-
         this.profiles = new Profiles();
         this.profiles.fetch();
 
         this.rules = new Rules();
         this.rules.fetch();
+
+        this.enabledTabs = new EnabledTabs();
     };
 
     App.prototype.getRedirectUrl = function (url) {
@@ -107,25 +47,70 @@ define(function (require) {
 
     App.prototype.run = function () {
         var that = this;
-        that.on('change:isEnabled', that.onIsEnabledChange.bind(that));
-        that.onIsEnabledChange();
+        var f = function (tabId) {
+            var model = that.enabledTabs.find(function (enabledTab) {
+                return enabledTab.get('tabId') === tabId;
+            });
+
+            if (!model) {
+                that.enabledTabs.add({
+                    tabId: tabId
+                });
+            } else {
+                that.enabledTabs.remove(model);
+            }
+            that.installRedirector();
+            that.updateBrowserAction();
+        };
+
         chrome.browserAction.onClicked.addListener(function (tab) {
-            that.isEnabled = !that.isEnabled;
+            chrome.windows.get(tab.windowId, function (w) {
+                if (w.type === "normal") {
+                    f(tab.id);
+                }else{
+                    that.updateBrowserAction();
+                }
+            });
         });
 
+        chrome.tabs.onActivated.addListener(function (activeInfo) {
+            that.updateBrowserAction();
+        });
     };
-    App.prototype.onIsEnabledChange = function () {
+
+
+    App.prototype.updateBrowserAction = function () {
+        var that = this;
+        chrome.tabs.query({
+            active: true,
+            windowType: 'normal'
+        }, function (activeTabs) {
+            _.every(activeTabs, function (activeTab) {
+                var model = that.enabledTabs.find(function (enabledTab) {
+                    return enabledTab.get('tabId') === activeTab.id;
+                });
+                if (model) {
+                    chrome.browserAction.setIcon({
+                        path: "images/19-enabled.png"
+                    });
+                } else {
+                    chrome.browserAction.setIcon({
+                        path: "images/19-disabled.png"
+                    });
+                }
+                return false;
+            });
+        });
+
+
+    };
+
+    App.prototype.installRedirector = function () {
         var that = this;
         if (!that.bindedOnBeforeRequest) {
             that.bindedOnBeforeRequest = that.onBeforeRequest.bind(that);
         }
         if (that.isEnabled) {
-//            console.log('enabled');
-            chrome.browserAction.setIcon({
-                path: "images/19-enabled.png"
-            });
-
-
             chrome.webRequest.onBeforeRequest.addListener(
                 that.bindedOnBeforeRequest,
                 // filters
@@ -136,20 +121,24 @@ define(function (require) {
                 ["blocking"]
             );
         } else {
-//            console.log('disabled');
-            chrome.browserAction.setIcon({
-                path: "images/19-disabled.png"
-            });
             chrome.webRequest.onBeforeRequest.removeListener(that.bindedOnBeforeRequest);
         }
     };
 
     App.prototype.onBeforeRequest = function (info) {
         var that = this;
+        //if the tabId is not in the list of enabled tabs, then simply ignore
+        if (!that.enabledTabs.find(function (tab) {
+            return tab.get('tabId') === info.tabId;
+        })) {
+            return {};
+        }
 
         var redirectUrl = that.getRedirectUrl(info.url);
-//        console.log(info.url, redirectUrl);
-        return {redirectUrl: redirectUrl};
+        if( info.url !== redirectUrl){
+            return {redirectUrl: redirectUrl};
+        }
+        return {};
     };
 
 
@@ -175,11 +164,7 @@ define(function (require) {
 
     Object.defineProperty(App.prototype, 'isEnabled', {
         get: function () {
-            return this.get('isEnabled');
-        },
-        set: function (val) {
-            this.set('isEnabled', val);
-            return this;
+            return this.enabledTabs.length > 0;
         }
     });
 

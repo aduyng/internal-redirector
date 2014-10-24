@@ -13,7 +13,6 @@ define(function (require) {
     App.prototype.initialize = function (options) {
         Super.prototype.initialize.call(this, options);
 
-        this.resourceTypes = this.background.resourceTypes;
         this.profiles = this.background.profiles;
         this.rules = this.background.rules;
 
