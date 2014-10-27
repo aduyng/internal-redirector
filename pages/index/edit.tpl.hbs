@@ -16,12 +16,23 @@
 
     <div class="form-group">
         <label for="{{id}}-name">Name</label>
-        <input type="text" class="form-control {{id}}-field" id="{{id}}-name" name="name" value="{{data.name}}" data-bv-notempty="true"/>
+        <input type="text" class="form-control {{id}}-field" id="{{id}}-name" name="name" value="{{data.name}}"
+               data-bv-notempty="true"/>
         <span class="help-block" id="{{id}}-name-message"></span>
     </div>
 
     <div class="form-group">
+        <label for="{{id}}-name">Status</label>
+
+        <div>
+            <input type="checkbox" id="{{id}}-is-active" data-on-color="success" {{#if data.isActive}}checked{{/if}}/>
+        </div>
+    </div>
+
+
+    <div class="form-group">
         <label for="{{id}}-rules">Rules</label>
+
         <div id="{{id}}-rules">
         </div>
     </div>

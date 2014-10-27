@@ -4,6 +4,7 @@ define(function (require) {
     var Super = require('views/page'),
         B = require('bluebird'),
         Collection = require('collections/profiles'),
+        BootstrapSwitch = require('bootstrapSwitch'),
         Template = require('hbs!./index.tpl');
 
     var Page = Super.extend({});
@@ -30,9 +31,16 @@ define(function (require) {
                 that.$el.html(Template(data));
 
                 that.mapControls();
+                that.find(that.toClass('is-active')).bootstrapSwitch();
+
+//                that.find(that.toClass('is-active')).on('switchChange.bootstrapSwitch', function(event, state) {
+//                    console.log(state);
+////                    that.model.save(that.serialize());
+//                });
 
                 var events = {};
                 events['click ' + that.toId('new')] = 'newButtonClickHandler';
+                events['switchChange.bootstrapSwitch ' + that.toClass('is-active')] = 'statusChangeHandler';
                 that.delegateEvents(events);
             })
             .finally(function () {
@@ -40,6 +48,13 @@ define(function (require) {
             });
     };
 
+    Page.prototype.statusChangeHandler = function(event, state) {
+        var e = $(event.currentTarget);
+        var model = this.collection.get(e.data('id'));
+        model.save({
+            isActive: state
+        });
+    };
 
     Page.prototype.newButtonClickHandler = function (event) {
         event.preventDefault();

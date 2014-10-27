@@ -1,6 +1,6 @@
 {
     "name": "Internal Redirector",
-    "version": "0.1",
+    "version": "1.0",
     "background": {
         "page": "background.html"
     },
@@ -9,6 +9,7 @@
         "webRequest",
         "webRequestBlocking",
         "https://*/*",
+        "http://*/*",
         "http://fonts.googleapis.com/*"],
     "icons": {
         "16": "images/16.png",
@@ -19,8 +20,8 @@
 
     "browser_action": {
         "default_icon": {
-            "19": "images/19-enabled.png",
-            "38": "images/38-enabled.png"
+            "19": "images/19-disabled.png",
+            "38": "images/38-disabled.png"
         }
     },
 

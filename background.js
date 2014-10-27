@@ -26,7 +26,10 @@ define(function (require) {
         var that = this;
         var newUrl = url;
         //get all active profiles
-        var profileIds = that.profiles.pluck('id');
+        var profileIds = _.map(that.profiles.where({isActive: true}), function(profile){
+            return profile.id;
+        });
+
         //get all rules
         var rules = that.rules.filter(function (rule) {
             return _.contains(profileIds, rule.get('profileId')) && !_.isEmpty(rule.get('pattern')) && !_.isEmpty(rule.get('replacement'));
@@ -39,6 +42,7 @@ define(function (require) {
                     return false;
                 }
             } catch (e) {
+                console.log(e);
             }
             return true;
         });
@@ -59,69 +63,63 @@ define(function (require) {
             } else {
                 that.enabledTabs.remove(model);
             }
-            that.installRedirector();
-            that.updateBrowserAction();
+            that.installRedirector(tabId);
+            that.updateBrowserAction(tabId);
         };
 
         chrome.browserAction.onClicked.addListener(function (tab) {
             chrome.windows.get(tab.windowId, function (w) {
                 if (w.type === "normal") {
                     f(tab.id);
-                }else{
-                    that.updateBrowserAction();
+                } else {
+                    that.updateBrowserAction(tab.id);
                 }
             });
         });
 
         chrome.tabs.onActivated.addListener(function (activeInfo) {
-            that.updateBrowserAction();
+            that.updateBrowserAction(activeInfo.tabId);
         });
     };
 
 
-    App.prototype.updateBrowserAction = function () {
+    App.prototype.updateBrowserAction = function (tabId) {
         var that = this;
-        chrome.tabs.query({
-            active: true,
-            windowType: 'normal'
-        }, function (activeTabs) {
-            _.every(activeTabs, function (activeTab) {
-                var model = that.enabledTabs.find(function (enabledTab) {
-                    return enabledTab.get('tabId') === activeTab.id;
-                });
-                if (model) {
-                    chrome.browserAction.setIcon({
-                        path: "images/19-enabled.png"
-                    });
-                } else {
-                    chrome.browserAction.setIcon({
-                        path: "images/19-disabled.png"
-                    });
-                }
-                return false;
-            });
+        var model = that.enabledTabs.find(function (enabledTab) {
+            return enabledTab.get('tabId') === tabId;
         });
-
-
+        if (model) {
+            chrome.browserAction.setIcon({
+                path: "images/19-enabled.png"
+            });
+        } else {
+            chrome.browserAction.setIcon({
+                path: "images/19-disabled.png"
+            });
+        }
     };
 
-    App.prototype.installRedirector = function () {
+    App.prototype.installRedirector = function (tabId) {
         var that = this;
         if (!that.bindedOnBeforeRequest) {
             that.bindedOnBeforeRequest = that.onBeforeRequest.bind(that);
         }
-        if (that.isEnabled) {
+        if (that.enabledTabs.length > 0 && !that.get('isListenerInstalled')) {
+            console.log('onBeforeRequest listener installed');
             chrome.webRequest.onBeforeRequest.addListener(
                 that.bindedOnBeforeRequest,
                 // filters
                 {
-                    urls: ["<all_urls>"]
+                    urls: ["http://*/*", "https://*/*"]
                 },
                 // extraInfoSpec
                 ["blocking"]
             );
+            that.set('isListenerInstalled', true);
         } else {
             chrome.webRequest.onBeforeRequest.removeListener(that.bindedOnBeforeRequest);
+            console.log('onBeforeRequest listener removed');
+            that.set('isListenerInstalled', false);
         }
     };
 
@@ -135,7 +133,7 @@ define(function (require) {
         }
 
         var redirectUrl = that.getRedirectUrl(info.url);
-        if( info.url !== redirectUrl){
+        if (info.url !== redirectUrl) {
             return {redirectUrl: redirectUrl};
         }
         return {};
@@ -162,11 +160,11 @@ define(function (require) {
         }
     });
 
-    Object.defineProperty(App.prototype, 'isEnabled', {
-        get: function () {
-            return this.enabledTabs.length > 0;
-        }
-    });
+//    Object.defineProperty(App.prototype, 'isEnabled', {
+//        get: function () {
+//            return this.get('isEnabled');
+//        }
+//    });
 
     return App;
 });

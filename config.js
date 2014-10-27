@@ -14,7 +14,8 @@ require = {
         nprogress: 'libs/nprogress',
         'underscore.string': 'libs/underscore.string.min',
         accounting: 'libs/accounting.min',
-        bootstrapValidator: 'libs/bootstrapValidator.min'
+        bootstrapValidator: 'libs/bootstrapValidator.min',
+        bootstrapSwitch: 'libs/bootstrap-switch.min'
     },
     hbs: {
         helpers: true,
@@ -25,6 +26,10 @@ require = {
     shim: {
         bootstrap: {
             deps: ['jquery']
+        },
+        bootstrapSwitch: {
+            deps: ['bootstrap'],
+            exports: '$.fn.bootstrapSwitch'
         },
         bootstrapValidator: {
             deps: ['bootstrap'],

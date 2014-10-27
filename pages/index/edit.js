@@ -6,6 +6,7 @@ define(function (require) {
         RulesView = require('./edit/rules'),
         Rules = require('collections/rules'),
         BootstapValidator = require('bootstrapValidator'),
+        BootstrapSwitch = require('bootstrapSwitch'),
         Template = require('hbs!./edit.tpl');
 
     var Page = Super.extend({});
@@ -43,6 +44,12 @@ define(function (require) {
 
                 //enable validator
                 that.controls.form.bootstrapValidator();
+
+                //enable status
+                that.controls.isActive.bootstrapSwitch();
+                that.controls.isActive.on('switchChange.bootstrapSwitch', function(event, state) {
+                    that.model.save(that.serialize());
+                });
 
                 var events = {};
 
@@ -86,6 +93,12 @@ define(function (require) {
             confirmDlg.close();
             that.back();
         });
+    };
+
+    Page.prototype.serialize = function(){
+        var data = Super.prototype.serialize.call(this);
+        data.isActive = this.controls.isActive.bootstrapSwitch('state');
+        return data;
     };
 
     Page.prototype.nameChangeHandler = function (event) {

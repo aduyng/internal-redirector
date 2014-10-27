@@ -9,6 +9,7 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Status</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -16,6 +17,7 @@
         {{#each data}}
             <tr data-id="{{this.id}}">
                 <td>{{this.name}}</td>
+                <td><input type="checkbox" class="{{../id}}-is-active" data-id="{{this.id}}" data-on-color="success" {{#if this.isActive}}checked{{/if}}/></td>
                 <td>
                     <a href="#index/edit/id/{{this.id}}"
                        class="btn btn-default btn-sm"><i
