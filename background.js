@@ -129,7 +129,8 @@ define(function (require) {
                            "https://*/*"]
                 },
                 // extraInfoSpec
-                ["blocking", "responseHeaders"]
+                ["blocking",
+                 "responseHeaders"]
             );
 
             that.set('isListenerInstalled', true);
@@ -151,7 +152,11 @@ define(function (require) {
         }
 
         var redirectUrl = that.getRedirectUrl(info.url);
+
         if (info.url !== redirectUrl) {
+//            if (info.url.match(/\.tpl$/)) {
+//                console.log('redirected', info.url, redirectUrl);
+//            }
             return {redirectUrl: redirectUrl};
         }
         return {};
@@ -171,6 +176,7 @@ define(function (require) {
         });
 
         if (isCorsAllowed) {
+//            console.log(info.url);
             var responseHeaders = info.responseHeaders || [];
             responseHeaders.push({
                 name: 'Access-Control-Allow-Origin',
