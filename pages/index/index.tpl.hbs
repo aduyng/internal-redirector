@@ -10,6 +10,7 @@
         <tr>
             <th>Name</th>
             <th>Status</th>
+            <th>CORS Allowed</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -18,6 +19,7 @@
             <tr data-id="{{this.id}}">
                 <td>{{this.name}}</td>
                 <td><input type="checkbox" class="{{../id}}-is-active" data-id="{{this.id}}" data-on-color="success" {{#if this.isActive}}checked{{/if}}/></td>
+                <td><input type="checkbox" class="{{../id}}-is-cors-allowed" data-id="{{this.id}}" data-on-color="success" {{#if this.isCorsAllowed}}checked{{/if}}/></td>
                 <td>
                     <a href="#index/edit/id/{{this.id}}"
                        class="btn btn-default btn-sm"><i

@@ -32,6 +32,7 @@ define(function (require) {
 
                 that.mapControls();
                 that.find(that.toClass('is-active')).bootstrapSwitch();
+                that.find(that.toClass('is-cors-allowed')).bootstrapSwitch();
 
 //                that.find(that.toClass('is-active')).on('switchChange.bootstrapSwitch', function(event, state) {
 //                    console.log(state);
@@ -41,6 +42,7 @@ define(function (require) {
                 var events = {};
                 events['click ' + that.toId('new')] = 'newButtonClickHandler';
                 events['switchChange.bootstrapSwitch ' + that.toClass('is-active')] = 'statusChangeHandler';
+                events['switchChange.bootstrapSwitch ' + that.toClass('is-cors-allowed')] = 'corsChangeHandler';
                 that.delegateEvents(events);
             })
             .finally(function () {
@@ -53,6 +55,14 @@ define(function (require) {
         var model = this.collection.get(e.data('id'));
         model.save({
             isActive: state
+        });
+    };
+
+    Page.prototype.corsChangeHandler = function(event, state) {
+        var e = $(event.currentTarget);
+        var model = this.collection.get(e.data('id'));
+        model.save({
+            isCorsAllowed: state
         });
     };
 

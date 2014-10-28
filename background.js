@@ -3,6 +3,7 @@ define(function (require) {
 
     var Backbone = require('backbone'),
         Super = Backbone.Model,
+        _ = require('underscore'),
         Profiles = require('collections/profiles'),
         Rules = require('collections/rules'),
         EnabledTabs = require('collections/enabled-tabs'),
@@ -26,7 +27,7 @@ define(function (require) {
         var that = this;
         var newUrl = url;
         //get all active profiles
-        var profileIds = _.map(that.profiles.where({isActive: true}), function(profile){
+        var profileIds = _.map(that.profiles.where({isActive: true}), function (profile) {
             return profile.id;
         });
 
@@ -42,7 +43,7 @@ define(function (require) {
                     return false;
                 }
             } catch (e) {
-                console.log(e);
+                //console.log(e);
             }
             return true;
         });
@@ -104,21 +105,38 @@ define(function (require) {
         if (!that.bindedOnBeforeRequest) {
             that.bindedOnBeforeRequest = that.onBeforeRequest.bind(that);
         }
+        if (!that.bindedOnHeadersReceived) {
+            that.bindedOnHeadersReceived = that.onHeadersReceived.bind(that);
+        }
         if (that.enabledTabs.length > 0 && !that.get('isListenerInstalled')) {
-            console.log('onBeforeRequest listener installed');
+            //console.log('listeners installed');
             chrome.webRequest.onBeforeRequest.addListener(
                 that.bindedOnBeforeRequest,
                 // filters
                 {
-                    urls: ["http://*/*", "https://*/*"]
+                    urls: ["http://*/*",
+                           "https://*/*"]
                 },
                 // extraInfoSpec
                 ["blocking"]
             );
+
+            chrome.webRequest.onHeadersReceived.addListener(
+                that.bindedOnHeadersReceived,
+                // filters
+                {
+                    urls: ["http://*/*",
+                           "https://*/*"]
+                },
+                // extraInfoSpec
+                ["blocking", "responseHeaders"]
+            );
+
             that.set('isListenerInstalled', true);
         } else {
             chrome.webRequest.onBeforeRequest.removeListener(that.bindedOnBeforeRequest);
-            console.log('onBeforeRequest listener removed');
+            chrome.webRequest.onHeadersReceived.removeListener(that.bindedOnHeadersReceived);
+            //console.log('listeners removed');
             that.set('isListenerInstalled', false);
         }
     };
@@ -135,6 +153,29 @@ define(function (require) {
         var redirectUrl = that.getRedirectUrl(info.url);
         if (info.url !== redirectUrl) {
             return {redirectUrl: redirectUrl};
+        }
+        return {};
+    };
+
+    App.prototype.onHeadersReceived = function (info) {
+        var that = this;
+        //if the tabId is not in the list of enabled tabs, then simply ignore
+        if (!that.enabledTabs.find(function (tab) {
+            return tab.get('tabId') === info.tabId;
+        })) {
+            return {};
+        }
+
+        var isCorsAllowed = that.profiles.find(function (profile) {
+            return profile.get('isActive') && profile.get('isCorsAllowed');
+        });
+
+        if (isCorsAllowed) {
+            var responseHeaders = info.responseHeaders || [];
+            responseHeaders.push({
+                name: 'Access-Control-Allow-Origin',
+                value: '*'});
+            return {responseHeaders: responseHeaders};
         }
         return {};
     };

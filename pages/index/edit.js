@@ -47,13 +47,19 @@ define(function (require) {
 
                 //enable status
                 that.controls.isActive.bootstrapSwitch();
-                that.controls.isActive.on('switchChange.bootstrapSwitch', function(event, state) {
+                that.controls.isActive.on('switchChange.bootstrapSwitch', function (event, state) {
+                    that.model.save(that.serialize());
+                });
+
+                that.controls.isCorsAllowed.bootstrapSwitch();
+                that.controls.isCorsAllowed.on('switchChange.bootstrapSwitch', function (event, state) {
                     that.model.save(that.serialize());
                 });
 
                 var events = {};
 
                 events['change ' + that.toId('name')] = 'nameChangeHandler';
+                events['change ' + that.toId('cors')] = 'corsChangeHandler';
                 events['click ' + that.toId('back')] = 'backButtonClickHandler';
                 events['click ' + that.toId('delete')] = 'deleteButtonClickHandler';
 
@@ -95,13 +101,19 @@ define(function (require) {
         });
     };
 
-    Page.prototype.serialize = function(){
+    Page.prototype.serialize = function () {
         var data = Super.prototype.serialize.call(this);
         data.isActive = this.controls.isActive.bootstrapSwitch('state');
+        data.isCorsAllowed = this.controls.isCorsAllowed.bootstrapSwitch('state');
         return data;
     };
 
     Page.prototype.nameChangeHandler = function (event) {
+        var that = this;
+        that.model.save(that.serialize());
+    };
+
+    Page.prototype.corsChangeHandler = function (event) {
         var that = this;
         that.model.save(that.serialize());
     };

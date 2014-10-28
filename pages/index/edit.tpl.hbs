@@ -29,6 +29,13 @@
         </div>
     </div>
 
+    <div class="form-group">
+        <label for="{{id}}-name">Access-Control-Allow-Origin:*</label>
+        <div>
+            <input type="checkbox" id="{{id}}-is-cors-allowed" data-on-color="success" {{#if data.isCorsAllowed}}checked{{/if}}/>
+        </div>
+    </div>
+
 
     <div class="form-group">
         <label for="{{id}}-rules">Rules</label>
