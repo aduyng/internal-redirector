@@ -21,6 +21,7 @@ define(function (require) {
         this.rules.fetch();
 
         this.enabledTabs = new EnabledTabs();
+        this.numberOfRedirectedRequests = -1;
     };
 
     App.prototype.getRedirectUrl = function (url) {
@@ -58,9 +59,12 @@ define(function (require) {
             });
 
             if (!model) {
-                that.enabledTabs.add({
+                model = that.enabledTabs.add({
                     tabId: tabId
                 });
+                model.on('change:numberOfRedirectedRequests', _.throttle(function () {
+                    that.updateBadgeText(model);
+                }, {leading: false}));
             } else {
                 that.enabledTabs.remove(model);
             }
@@ -81,6 +85,20 @@ define(function (require) {
         chrome.tabs.onActivated.addListener(function (activeInfo) {
             that.updateBrowserAction(activeInfo.tabId);
         });
+        chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+            switch (changeInfo.status) {
+            case 'loading':
+                var model = that.enabledTabs.find(function (enabledTab) {
+                    return enabledTab.get('tabId') === tabId;
+                });
+
+                if (model) {
+                    model.set('numberOfRedirectedRequests', 0);
+                }
+                break;
+
+            }
+        });
     };
 
 
@@ -93,11 +111,24 @@ define(function (require) {
             chrome.browserAction.setIcon({
                 path: "images/19-enabled.png"
             });
+            that.updateBadgeText(model);
         } else {
             chrome.browserAction.setIcon({
                 path: "images/19-disabled.png"
             });
+
+            chrome.browserAction.setBadgeText({
+                text: ''
+            });
         }
+
+
+    };
+
+    App.prototype.updateBadgeText = function (enabledTab) {
+        chrome.browserAction.setBadgeText({
+            text: enabledTab.get('numberOfRedirectedRequests') !== undefined ? enabledTab.get('numberOfRedirectedRequests').toString() : ''
+        });
     };
 
     App.prototype.installRedirector = function (tabId) {
@@ -144,10 +175,12 @@ define(function (require) {
 
     App.prototype.onBeforeRequest = function (info) {
         var that = this;
-        //if the tabId is not in the list of enabled tabs, then simply ignore
-        if (!that.enabledTabs.find(function (tab) {
+        var enabledTab = that.enabledTabs.find(function (tab) {
             return tab.get('tabId') === info.tabId;
-        })) {
+        });
+
+        //if the tabId is not in the list of enabled tabs, then simply ignore
+        if (!enabledTab) {
             return {};
         }
 
@@ -157,6 +190,7 @@ define(function (require) {
 //            if (info.url.match(/\.tpl$/)) {
 //                console.log('redirected', info.url, redirectUrl);
 //            }
+            enabledTab.set('numberOfRedirectedRequests', (enabledTab.get('numberOfRedirectedRequests') || 0) + 1);
             return {redirectUrl: redirectUrl};
         }
         return {};

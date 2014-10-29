@@ -94,6 +94,14 @@ define(function (require) {
             ]
         });
         confirmDlg.on('yes', function () {
+            if( !that.model.isNew() ) {
+                _.forEach(that.rules.where({
+                    profileId: that.model.id
+                }), function (rule) {
+                    rule.destroy();
+                });
+            }
+            //destroy all the rules first
             that.model.destroy();
             that.toast.success('Profile has been deleted successfully.');
             confirmDlg.close();

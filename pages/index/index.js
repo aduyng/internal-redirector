@@ -13,6 +13,7 @@ define(function (require) {
         //super(options)
         Super.prototype.initialize.call(this, options);
         this.collection = this.app.profiles;
+        this.rules = this.app.rules;
     };
 
     Page.prototype.render = function () {
@@ -41,6 +42,7 @@ define(function (require) {
 
                 var events = {};
                 events['click ' + that.toId('new')] = 'newButtonClickHandler';
+                events['click ' + that.toClass('copy')] = 'copyButtonClickHandler';
                 events['switchChange.bootstrapSwitch ' + that.toClass('is-active')] = 'statusChangeHandler';
                 events['switchChange.bootstrapSwitch ' + that.toClass('is-cors-allowed')] = 'corsChangeHandler';
                 that.delegateEvents(events);
@@ -74,6 +76,23 @@ define(function (require) {
         this.goTo('index/edit/id/' + model.id);
     };
 
+    Page.prototype.copyButtonClickHandler = function (event) {
+        var that = this;
+        event.preventDefault();
+        var e = $(event.currentTarget);
+
+        var model = that.collection.get(e.data('id'));
+        var newModel = that.collection.create(_.extend(_.omit(model.toJSON(), 'id'), {name: 'Copy of ' + model.get('name')}));
+
+        //copy all rules
+        _.forEach(that.rules.where({
+            profileId: model.id
+        }), function(rule){
+            that.rules.create(_.extend(_.omit(rule.toJSON(), 'id'), {profileId: newModel.id}));
+        });
+
+        this.reload();
+    };
 
     return Page;
 
