@@ -8,6 +8,7 @@
     <table class="table table-bordered table-hover table-striped">
         <thead>
         <tr>
+            <th><input type="checkbox" id="{{id}}-select-all" /></th>
             <th>Name</th>
             <th>Status</th>
             <th>CORS Allowed</th>
@@ -17,6 +18,7 @@
         <tbody id="{{../id}}-tbody">
         {{#each data}}
             <tr data-id="{{this.id}}">
+                <td><input class="{{../id}}-select-checkbox" type="checkbox" id="{{../id}}-select-{{this.id}}" data-id="{{this.id}}" /></td>
                 <td>{{this.name}}</td>
                 <td><input type="checkbox" class="{{../id}}-is-active" data-id="{{this.id}}" data-on-color="success" {{#if this.isActive}}checked{{/if}}/></td>
                 <td><input type="checkbox" class="{{../id}}-is-cors-allowed" data-id="{{this.id}}" data-on-color="success" {{#if this.isCorsAllowed}}checked{{/if}}/></td>
@@ -36,5 +38,10 @@
         {{/each}}
         </tbody>
     </table>
+    <div class="btn-group">
+        <button class="btn btn-info" disabled id="{{id}}-export"><i class="icon-download"></i> Export</button>
+        <button class="btn btn-warning" id="{{id}}-import"><i class="icon-upload"></i> Import</button>
+        <input type="file" id="{{id}}-file" style="opacity: 0">;
+    </div>
 
 </div>

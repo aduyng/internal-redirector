@@ -15,7 +15,8 @@ require = {
         'underscore.string': 'libs/underscore.string.min',
         accounting: 'libs/accounting.min',
         bootstrapValidator: 'libs/bootstrapValidator.min',
-        bootstrapSwitch: 'libs/bootstrap-switch.min'
+        bootstrapSwitch: 'libs/bootstrap-switch.min',
+        FileSaver: 'libs/FileSaver.min'
     },
     hbs: {
         helpers: true,
@@ -24,6 +25,10 @@ require = {
         partialsUrl: ''
     },
     shim: {
+        FileSaver: {
+            deps: ['jquery'],
+            exports: 'saveAs'
+        },
         bootstrap: {
             deps: ['jquery']
         },
