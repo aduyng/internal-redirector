@@ -1,6 +1,8 @@
 import Vue from 'vue';
+import Vuetify from 'vuetify';
 import Layout from './components/Layout/Layout.vue';
-import './style/options.scss';
+
+Vue.use(Vuetify);
 
 new Vue({
   el: '#layout',

@@ -66,6 +66,17 @@ module.exports = (env) => {
               }
             },
           ]
+        },
+        {
+          test: /\.(ttf|eot|woff|woff2)$/,
+          use: {
+            loader: "file-loader",
+            options: {
+              name: "[name].[ext]",
+              outputPath: 'fonts/',
+              publicPath: '../fonts',
+            },
+          },
         }
       ]
     },
@@ -77,10 +88,20 @@ module.exports = (env) => {
     },
     plugins: [
       new VueLoaderPlugin(),
-      new CopyWebpackPlugin([{
-        from: path.resolve(__dirname, 'src/images/icons'),
-        to: path.join(dist, 'images/icons')
-      }]),
+      new CopyWebpackPlugin([
+        {
+          from: path.resolve(__dirname, 'src/images/icons'),
+          to: path.join(dist, 'images/icons')
+        },
+        {
+          from: path.resolve(__dirname, 'node_modules/vuetify/dist/vuetify.min.css'),
+          to: path.join(dist, 'vendors/vuetify')
+        },
+        {
+          from: path.resolve(__dirname, 'node_modules/roboto-fontface/css/roboto/roboto-fontface.css'),
+          to: path.join(dist, 'vendors/roboto')
+        }
+      ]),
       new CleanWebpackPlugin([dist]),
       new GenerateJsonPlugin('manifest.json', manifest),
       new HtmlWebpackPlugin({  // Also generate a test.html

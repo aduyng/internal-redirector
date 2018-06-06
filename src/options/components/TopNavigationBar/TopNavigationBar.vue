@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import { MDCTopAppBar } from "@material/top-app-bar/index";
-import "@material/top-app-bar/mdc-top-app-bar.scss";
 
 export default {
   data() {
@@ -22,8 +20,6 @@ export default {
     };
   },
   mounted() {
-    const header = this.$el.querySelector('.mdc-top-app-bar');
-    this.topAppBar = new MDCTopAppBar(header);
   }
 };
 </script>
