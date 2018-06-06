@@ -1,0 +1,44 @@
+{
+  "name": "internal-redirector",
+  "version": "2.0.0",
+  "description": "Selectively redirect requests",
+  "main": "src/background/background.js",
+  "scripts": {
+    "start": "webpack --config webpack.config.js --mode=development --env.watch=true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aduyng/internal-redirector.git"
+  },
+  "author": "Duy Nguyen <aduyng@gmail.com> (https://github.com/aduyng)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aduyng/internal-redirector/issues"
+  },
+  "homepage": "https://github.com/aduyng/internal-redirector#readme",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0"
+  },
+  "devDependencies": {
+    "@material/button": "^0.36.0",
+    "@material/layout-grid": "^0.34.0",
+    "@material/ripple": "^0.36.0",
+    "@material/top-app-bar": "^0.36.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "extract-loader": "^2.0.1",
+    "file-loader": "^1.1.11",
+    "generate-json-webpack-plugin": "^0.3.1",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.3",
+    "vue": "^2.5.16",
+    "vue-loader": "^15.2.4",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.11.1",
+    "webpack-cli": "^3.0.2"
+  }
+}
